@@ -1,46 +1,56 @@
-/* === CUSTOM === */
 
-/* Hero section */
+body {
+    background-color: whitesmoke;
+}
+        
+.navbar-brand {
+    font-weight: 700;
+    font-size: 1.5rem;
+}
+        
 .hero {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
     padding: 80px 0;
     margin-bottom: 50px;
 }
-
-/* Product cards */
+        
+.hero h1 {
+    color:white;
+    font-weight: 700;
+    margin-bottom: 15px;
+}
+        
 .product-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     height: 100%;
 }
-
+        
 .product-card:hover {
     transform: translateY(-8px);
     box-shadow: 0 10px 25px rgba(0,0,0,0.15);
 }
-
+        
 .product-card img {
     height: 250px;
-    object-fit: cover;
+    object-fit: contain;
 }
-
-/* Price */
-.old-price {
-    text-decoration: line-through;
-    color: #999;
-    font-size: 0.9rem;
-}
-
-.price {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: #28a745;
-}
-
-/* Discount badge */
+        
 .badge-discount {
     position: absolute;
     top: 10px;
     right: 10px;
     z-index: 10;
+}
+        
+.old-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+}
+        
+.price {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #28a745;
 }

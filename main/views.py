@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from .models import Manual
 
 def index(request):
-    return render(request, 'main/index.html')
+    manuals = Manual.objects.all()
+    return render(request, 'main/index.html', {'manuals' : manuals})
