@@ -23,6 +23,8 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+    path('auth/login', views.google_login, name='google_login'),
+    path('auth/callback', views.google_callback, name='google_callback'),
 ]
 
 if settings.DEBUG:
