@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login
+from django.contrib import messages
+from django.contrib.auth import login, authenticate
 from .models import Manual, Profile
 import requests
 import jwt
@@ -14,6 +15,49 @@ load_dotenv()
 def index(request):
     manuals = Manual.objects.all()
     return render(request, 'main/index.html', {'manuals' : manuals})
+
+def user_login(request):
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+
+        if not email or not password:
+            messages.error(request, 'Please fill in all fields')
+            return redirect('index')
+
+        try:
+            user = User.objects.get(email=email)
+
+            user = authenticate(request, username=user.username, password=password)
+
+            if user is not None:
+                login(request, user)
+                messages.success(request, f'Welcome back, {user.first_name}')
+                return redirect('index')
+            else:
+                messages.error(request, 'Invalid password')
+                return redirect('index')
+            
+        except User.DoesNotExist:
+            messages.error(request, 'User does not exist')
+            #return render(request, 'main/index.html', {'error': 'User does not exist'})
+            return redirect('index')
+
+    return redirect('index')
+
+def user_register(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+    
+        if User.objects.filter(email=email).exists():
+            return render(request, 'main/index.html', {'error': 'Email is alredy used'})
+        else:
+            User.objects.create_user(email=email, password=password, username=username)
+            return redirect('index')
+    
+    return render(request, 'main/index.html')
 
 def google_login(request):
     client_id = os.getenv('GOOGLE_CLIENT_ID')
@@ -72,3 +116,4 @@ def user_exist_vefication(userinfo):
             google_id=userinfo.get('sub', '')
         )
         return user
+    

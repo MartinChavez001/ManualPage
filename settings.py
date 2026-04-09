@@ -27,6 +27,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+USE_GENERATE_AVATARS = True
+
 
 # Application definition
 

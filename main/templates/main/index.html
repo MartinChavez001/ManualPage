@@ -32,14 +32,19 @@
                     </li>
                     {% if request.user.is_authenticated %}
                         <li class="nav-item d-flex align-items-center">
-                            <img src="{{ request.user.profile.avatar_url }}" alt="Avatar" class="rounded-circle me-2" width="32" height="32">
-                            <span class="nav-link">{{ request.user.first_name }}</span>
+                            <img src="{{ request.user.profile.get_avatar }}" alt="Avatar" class="rounded-circle me-2" width="32" height="32">
+                            <span class="nav-link">{{ request.user.profile.get_display_name }}</span>
                         </li>
                     {% else %}
                         <li class="nav-item">
                             <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
                                 Login
                             </button>
+                    </li>
+                    <li class="nav-item">
+                        <button>
+                            Logout
+                        </button>
                     </li>
                     {% endif %}
                 </ul>
@@ -86,20 +91,126 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="loginModalLabel">Login to your account</h5>
+                    <h5 class="modal-title" id="modalTitle">Login to your account</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Login with google -->
-                    <a href="{% url 'google_login' %}" class="btn btn-outline-danger w-100 mb-3"> 
-                        Sign in with Google
-                        <svg width="24" height="24" viewBox="0 0 48 48" style="vertical-align: middle; margin-right: 8px">
-                            <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
-                            <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
-                            <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
-                            <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
-                        </svg>
-                    </a>
+
+                    {% if messages %}
+                        <div class="container bg-warning mt-3">
+                            {% for message in messages %}
+                                
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                                
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+
+                    <div id="loginForm" class="p-4 rounded shadow-sm bg-light">
+                        <form method="post" action="{% url 'user_login' %}">
+                            {% csrf_token %}
+                            {% if error %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endif %}
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" placeholder="Enter your email">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" name="password" class="form-control" placeholder="Enter your password">
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 mt-3">Login</button>
+                        </form>
+
+                        <!-- Divider -->
+
+                        <div class="text-center my-3">
+                            <span class="text-muted"></span>
+                        </div>
+                        
+                        <!-- Login with google -->
+                        
+                        <a href="{% url 'google_login' %}" class="btn btn-outline-danger w-100 mb-3"> 
+                            Sign in with Google
+                            <svg width="24" height="24" viewBox="0 0 48 48" style="vertical-align: middle; margin-right: 8px">
+                                <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+                                <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+                                <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
+                                <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+                            </svg>
+                        </a>
+                        <!-- Switch to register -->
+
+                        <div class="text-center mt-3">
+                            <p class="text-muted mb-0">
+                                Don't have an account?
+                                <a href="#" id="showRegister" class="text-primary fw-bold">Sign up</a>
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Register modal -->
+
+                    <div id="registerForm" style="display: none;" class="p-4">
+                        <form method="post" action="{% url 'user_register' %}">
+                            {% csrf_token %}
+                            {% if error %}
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                {{ error }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                            {% endif %}
+
+                            <div class="mb-3">
+                                <label for="username" class="form-label">Username</label>
+                                <input type="username" name="username" class="form-control" placeholder="Enter your username">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" name="email" class="form-control" placeholder="Enter your email">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" name="password" class="form-control" placeholder="Enter your password">
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Confirm Password</label>
+                                <input type="password" name="confirm_password" class="form-control" placeholder="Enter your password">
+                            </div>
+                            <div class="mb-3">
+                                <button type="submit" class="btn btn-primary w-100 mt-3">Create Account</button>
+                            </div>
+                        </form>
+                                                <!-- Login with google -->
+                        
+                        <a href="{% url 'google_login' %}" class="btn btn-outline-danger w-100 mb-3"> 
+                            Sign in with Google
+                            <svg width="24" height="24" viewBox="0 0 48 48" style="vertical-align: middle; margin-right: 8px">
+                                <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z"/>
+                                <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z"/>
+                                <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24c0 3.55.85 6.91 2.34 9.88l7.35-5.7z"/>
+                                <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z"/>
+                            </svg>
+                        </a>
+
+                        <!-- Switch to Login -->
+
+                        <div class="text-center mt-3">
+                            <p class="text-muted mb-0">
+                                Already have an account?
+                                <a href="#" id="showLogin" class="text-primary fw-bold">Login</a>
+                            </p>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -121,12 +232,33 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        document.querySelectorAll('.btn-primary').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                alert('¡Producto agregado al carrito! (esto después lo hacés real con Django)');
-            });
+        document.getElementById('showRegister').addEventListener('click', function(e){
+            e.preventDefault();
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('modalTitle').textContent = 'Create your account'
         });
+
+        document.getElementById('showLogin').addEventListener('click', function(e){
+            e.preventDefault();
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('modalTitle').textContent = 'Login to your account';
+        });
+
+        document.getElementById('loginModal').addEventListener('hidden.bs.modal', function(){
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('modalTitle').textContent = 'Login to your account';
+        });
+
+        {% if messages %}
+            document.addEventListener('DOMContentLoaded', function(){
+                var loginModal = new bootstrap.Modal(document.getElementById('loginModal'))
+                loginModal.show();
+            });
+        {% endif %}
+
     </script>
 </body>
 </html>
