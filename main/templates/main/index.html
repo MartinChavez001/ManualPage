@@ -26,7 +26,7 @@
                         <a class="nav-link active" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="shopping-cart.html">
+                        <a class="nav-link" href="{% url 'shop_cartview' %}">
                             🛒 Cart <span class="badge bg-primary">0</span>
                         </a>
                     </li>
@@ -75,6 +75,9 @@
                             <p class="card-text text-muted">{{ manual.description }}</p>
                             <div class="d-flex justify-content-between align-items-center mb-3">
                                 <span class="badge bg-primary">{{ manual.category }}</span>
+                            </div>
+                            <div class="p-1 mb-3">
+                                <span class="badge bg-danger p-3 fs-5 d-block text-cencer"> ${{ manual.price}}</span>
                             </div>
                             <button class="btn btn-primary w-100"> 🛒 Add to Cart </button>
                         </div>
@@ -253,6 +256,7 @@
         });
 
         {% if messages %}
+        
             document.addEventListener('DOMContentLoaded', function(){
                 var loginModal = new bootstrap.Modal(document.getElementById('loginModal'))
                 loginModal.show();

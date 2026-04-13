@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from urllib.parse import urlencode
 from django.contrib.auth.models import User
 from django.db import models
+from .shop_cart import shop_cart
 
 load_dotenv()
 
@@ -23,7 +24,7 @@ def user_login(request):
 
         if not email or not password:
             messages.error(request, 'Please fill in all fields')
-            return redirect('index')
+            return redirect('index.html')
 
         try:
             user = User.objects.get(email=email)
@@ -33,17 +34,17 @@ def user_login(request):
             if user is not None:
                 login(request, user)
                 messages.success(request, f'Welcome back, {user.first_name}')
-                return redirect('index')
+                return redirect('index.html')
             else:
                 messages.error(request, 'Invalid password')
-                return redirect('index')
+                return redirect('index.html')
             
         except User.DoesNotExist:
             messages.error(request, 'User does not exist')
             #return render(request, 'main/index.html', {'error': 'User does not exist'})
             return redirect('index')
 
-    return redirect('index')
+    return redirect('index.html')
 
 def user_register(request):
     if request.method == 'POST':
@@ -97,7 +98,7 @@ def google_callback(request):
 
     user = user_exist_vefication(userinfo)
     login(request, user)
-    return redirect('index')
+    return redirect('index.html')
 
 def user_exist_vefication(userinfo):
     email = userinfo['email']
@@ -115,5 +116,21 @@ def user_exist_vefication(userinfo):
             avatar_url=userinfo.get('picture',''),
             google_id=userinfo.get('sub', '')
         )
-        return user
+        return 
+
+# Flujo: crear una instancia del carrito, obtener los items, pasarlos al template    
+# Orden: Mostrar el carrito, y despues checkout
+
+#1) verificar usuario 2) Obtener carrito 3) Validar carrito 4) crear la compra 5) create items 6) Paid 7) Clear shop-cart 8) Confirm
+
+#2) 1) Tengo: Modelos (Manual, Purchase) 2) Carrito por sesion 3) Vista principal (INDEX) 4) Boton de carrito. TENGO QUE CONECTAR Todo 
+
+def shop_cartview(request):
+
+    shop_cartinfo = shop_cart(request) 
+
+    shop_items = {
+            'item': shop_cartinfo.shop_cart
+        }
     
+    return render(request, 'main/shoppingcart.html', shop_items)

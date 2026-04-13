@@ -10,7 +10,7 @@ class shop_cart:
         
         if not shop_cart:
             self.session["shop-cart"] = {}
-            self.shop_cart = self.session("shop-cart")
+            self.shop_cart = self.session.get("shop-cart")
 
         else:
             self.shop_cart = shop_cart

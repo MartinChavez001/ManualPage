@@ -52,15 +52,12 @@ class Manual(models.Model):
     def __str__(self):
         return self.name
 
-
-# orden a seguir: 1) terminar la clse Purchase 2) Plantear la necesidad de un modelo intermedio tipo : items de compra 3) Pasar a views y el checkout
-
 class Purchase(models.Model):
     user = models.ForeignKey(User, on_delete= models.CASCADE)
     date = models.DateTimeField(auto_now_add=True)
 
 class PurchaseItem(models.Model):
     purchase = models.ForeignKey(Purchase, on_delete=models.CASCADE)
-    manual = models.ForeignKey(Manual)
+    manual = models.ForeignKey(Manual, on_delete=models.SET_NULL, null=True)
     quantity = models.PositiveIntegerField()
     unit_price = models.DecimalField(max_digits=10, decimal_places=2)

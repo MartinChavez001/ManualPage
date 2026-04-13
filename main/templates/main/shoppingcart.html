@@ -1,0 +1,17 @@
+{% load static %}
+
+<!DOCTYPE html>
+<head></head>
+<body>
+    <h1>hola</h1>
+    <ul>{% if item %}
+            {% for key, item in item.items %}
+                <li>
+                    {{ item.name }}, {{ item.price }}, {{ item.quantity }}
+                </li>
+            {% endfor %}
+        {% else %}
+            <p> El carrito esta vacio</p>
+        {% endif %}
+    </ul>
+</body>

@@ -21,12 +21,13 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+    path('admin/', admin.site.urls),
     path('login/', views.user_login, name='user_login'),
     path('register/', views.user_register, name='user_register'),
     path('auth/login', views.google_login, name='google_login'),
     path('auth/callback', views.google_callback, name='google_callback'),
+    path('cart/', views.shop_cartview, name='shop_cartview'),
 ]
 
 if settings.DEBUG:
