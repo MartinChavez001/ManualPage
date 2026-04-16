@@ -3,12 +3,27 @@
 <!DOCTYPE html>
 <head></head>
 <body>
-    <h1>hola</h1>
     <ul>{% if item %}
             {% for key, item in item.items %}
                 <li>
                     {{ item.name }}, {{ item.price }}, {{ item.quantity }}
+                    <form method="POST" action="{% url 'remove_to_cart' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="manual_id" value="{{ key }}">
+                            <button> Delete </button>
+                    </form>
                 </li>
+
+                <li>
+                    <form method="POST" action="{% url 'clear_cart' %}">
+                        {% csrf_token %}
+                        <button> Clear </button>
+                    </form>
+                </li>
+
+                <div>
+                    <p> Total: $ {{ total }} </p>
+                </div>
             {% endfor %}
         {% else %}
             <p> El carrito esta vacio</p>

@@ -25,7 +25,7 @@ class shop_cart:
         else:
             self.shop_cart[manual_id_str] = {
                 'name': manual.name,
-                'price': str(manual.price),
+                'price': float(manual.price),
                 'imge': manual.image.url if manual.image else '',
                 'quantity': 1,
             }
@@ -52,7 +52,7 @@ class shop_cart:
     def __len__(self):
         return sum(item['quantity'] for item in self.shop_cart.values())
     
-    def get_total(self):
+    def get_items(self):
         items = []
         for manual_id, item_data in self.shop_cart.items():
             item = item_data.copy()
