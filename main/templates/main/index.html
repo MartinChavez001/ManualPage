@@ -26,9 +26,10 @@
                         <a class="nav-link active" href="/">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'shop_cartview' %}">
-                            🛒 Cart <span class="badge bg-primary">0</span>
-                        </a>
+                        <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#show_cart_canva">
+                            🛒 Cart 0
+                        </button>
+
                     </li>
                     {% if request.user.is_authenticated %}
                         <li class="nav-item d-flex align-items-center">
@@ -54,6 +55,7 @@
             </div>
         </div>
     </nav>
+    {% include "main/components/cart_modal.html" %}
 
     <!-- HERO SECTION -->
     <section class="hero text-center">
