@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from django.contrib import messages
 from django.contrib.auth import login, authenticate, logout
+from django.http import JsonResponse
 from .models import Manual, Profile
-import requests
+import requests , json
 import jwt
 import os
 from dotenv import load_dotenv
@@ -15,7 +16,16 @@ load_dotenv()
 
 def index(request):
     manuals = Manual.objects.all()
-    return render(request, 'main/index.html', {'manuals' : manuals})
+
+    shop_cartinfo = shop_cart(request) 
+
+    shop_items = {
+            'manuals': manuals,
+            'item': shop_cartinfo.shop_cart,
+            'total' : shop_cartinfo.get_total()
+        }
+
+    return render(request, 'main/index.html', shop_items)
 
 def user_login(request):
     if request.method == 'POST':
@@ -123,28 +133,31 @@ def user_exist_vefication(userinfo):
         )
         return 
 
-def shop_cartview(request):
-
-    shop_cartinfo = shop_cart(request) 
-
-    shop_items = {
-            'item': shop_cartinfo.shop_cart,
-            'total' : shop_cartinfo.get_total()
-        }
-    
-    return render(request, 'main/shoppingcart.html', shop_items)
-
 def add_to_cart(request):
 
     if request.method == "POST":
-        manual_id = request.POST.get('manual_id')
+        try:
+            data = json.loads(request.body)
+            manual_id = data.get("manual_id")
 
-        actual_cart = shop_cart(request)
+            if not manual_id:
+                return JsonResponse({"error": "No manual_id"}, status=400)
 
-        actual_cart.add(manual_id)
+            cart = shop_cart(request)
+            cart.add(manual_id)
 
-        return redirect('shop_cartview')
-    
+            print("CART:", cart.shop_cart)
+
+            return JsonResponse({
+                "count": len(cart)
+            })
+
+        except Exception as e:
+            print("ERROR:", e)
+            return JsonResponse({"error": str(e)}, status=500)
+
+    return JsonResponse({"error": "Invalid request"}, status=400)
+
 def remove_to_cart(request):
 
     if request.method == 'POST':
@@ -154,7 +167,7 @@ def remove_to_cart(request):
 
         actual_cart.remove(manual_id)
 
-        return redirect('shop_cartview')
+        return redirect('index')
 
 def clear_cart(request):
 
@@ -164,4 +177,4 @@ def clear_cart(request):
 
         actual_cart.clear()
 
-        return redirect('shop_cartview')
+        return redirect('index')

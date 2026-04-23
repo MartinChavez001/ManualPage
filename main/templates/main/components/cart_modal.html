@@ -3,10 +3,37 @@
         <h5 class="offcanvas-title" id="offcanvasTittle"> Your Cart </h5>
         <button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
     </div>
-    <div class="offcanvas-body">
-        <div class="container bg-warning mt-3">
-            
+    <div class="offcanvas-body d-flex flex-column">
+        <div class="container mt-3">
+            <ul class="list-unstyled"> {% if item %}
+                    {% for key, item in item.items %}
+                        <li>
+                            <div class="card" style="width: 18rem;">
+                                <img src="{{ item.image }}" class="card-img-top" alt="{{ item.name }}">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold">{{ item.name }}</h5>
+                                    <p class="card-text badge text-bg-primary text-warp" style="width: 6rem;">Price: ${{ item.price }}</p>
+                                    <p class="cartd-text fw-bold">Quantity: {{ item.quantity }}</p>
+                                    <form method="POST" action="{% url 'remove_to_cart' %}">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="manual_id" value="{{ key }}">
+                                        <button class="btn btn-danger"> Delete </button>
+                                    </form>
+                            </div>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <p> Cart empty </p>
+                {% endif %}
+            </ul>
         </div>
-        <h5>hola</h5>
+        <div class="mt-auto d-flex justify-content-between aligh-items-center mt-3">
+            <form method="POST" action="{% url 'clear_cart' %}">
+                {% csrf_token %}
+                <button class="btn btn-danger"> Clear </button>
+            </form>
+
+            <button class="btn btn-success">Total: $ {{ total }}</button>
+        </div>
     </div>
 </div>

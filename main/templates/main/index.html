@@ -21,13 +21,14 @@
             
             <!-- Nav links -->
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto gap-3">
                     <li class="nav-item">
                         <a class="nav-link active" href="/">Home</a>
                     </li>
                     <li class="nav-item">
                         <button class="btn btn-outline-primary" type="button" data-bs-toggle="offcanvas" data-bs-target="#show_cart_canva">
-                            🛒 Cart 0
+                            🛒 Cart
+                            <span id="cart-count">{{ item|length }}</span>
                         </button>
 
                     </li>
@@ -84,11 +85,11 @@
                             <div class="p-1 mb-3">
                                 <span class="badge bg-danger p-3 fs-5 d-block text-cencer"> ${{manual.price}}</span>
                             </div>
-                            <form method="POST" action="{% url 'add_to_cart' %}">
-                                {% csrf_token %}
-                                <input type="hidden" name="manual_id" value="{{ manual.id }}">
-                                <button class="btn btn-primary w-100"> 🛒 Add to Cart</button>
-                            </form>
+                            
+                            
+                            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+                            <button type="button" class="add-to-cart btn btn-primary w-100" data-id="{{ manual.id }}"> 🛒 Add to Cart</button>
+                            
                         </div>
                     </div>
                 </div>
@@ -244,6 +245,13 @@
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        function getCSRFToken() {
+            return document.cookie.split('; ')
+                .find(row => row.startsWith('csrftoken'))
+                .split('=')[1];
+        }
+    </script>
+    <script>
         document.getElementById('showRegister').addEventListener('click', function(e){
             e.preventDefault();
             document.getElementById('loginForm').style.display = 'none';
@@ -263,6 +271,27 @@
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('modalTitle').textContent = 'Login to your account';
         });
+    </script>
+    <script>
+            document.querySelectorAll(".add-to-cart").forEach(btn => {
+                btn.addEventListener("click", function() {
+
+                    const manualId = this.dataset.id;
+
+                    fetch("/cart/add/", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRFToken": getCSRFToken(),
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({ manual_id: manualId })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        document.getElementById("cart-count").innerText = data.count;
+                    });
+                });
+            });
     </script>
     <script>
         var showModal = false;

@@ -8,16 +8,17 @@ class shop_cart:
 
         shop_cart = self.session.get("shop-cart")
         
-        if not shop_cart:
+        if "shop-cart" not in self.session:
             self.session["shop-cart"] = {}
-            self.shop_cart = self.session.get("shop-cart")
 
+            self.shop_cart = self.session["shop-cart"]
         else:
             self.shop_cart = shop_cart
 
     def add(self, manual_id):
         manual = Manual.objects.get(id=manual_id)
         manual_id_str = str(manual_id)
+        print(manual_id, type(manual_id))
 
         if manual_id_str in self.shop_cart:
             self.shop_cart[manual_id_str]['quantity'] += 1
@@ -26,7 +27,7 @@ class shop_cart:
             self.shop_cart[manual_id_str] = {
                 'name': manual.name,
                 'price': float(manual.price),
-                'imge': manual.image.url if manual.image else '',
+                'image': manual.image.url if manual.image else '',
                 'quantity': 1,
             }
 
@@ -48,6 +49,7 @@ class shop_cart:
     def clear(self):
         self.session['shop-cart'] = {}
         self.session.modified = True
+        self.units = 0
 
     def __len__(self):
         return sum(item['quantity'] for item in self.shop_cart.values())
